@@ -1,0 +1,100 @@
+// File: PaymentGatewaySimulation.java
+package com.example.payments;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+// Enum for transaction status
+enum Status { PENDING, SUCCESS, FAILED }
+
+// Enum for payment type
+enum PaymentType { WALLET, CARD, UPI }
+
+// Transaction class
+class Transaction {
+    String userId;
+    double amount;
+    PaymentType type;
+    Status status;
+    public Transaction(String userId, double amount, PaymentType type){
+        this.userId = userId; this.amount = amount; this.type = type; this.status = Status.PENDING;
+    }
+}
+
+// User wallet class
+class Wallet {
+    String userId;
+    private double balance;
+    private final ReentrantLock lock = new ReentrantLock();
+    
+    public Wallet(String userId, double initialBalance){ this.userId = userId; this.balance = initialBalance; }
+    
+    public boolean debit(double amt){
+        lock.lock();
+        try{
+            if(balance >= amt){ balance -= amt; return true; }
+            return false;
+        } finally { lock.unlock(); }
+    }
+    
+    public void credit(double amt){
+        lock.lock();
+        try{ balance += amt; } finally { lock.unlock(); }
+    }
+    
+    public double getBalance(){ return balance; }
+}
+
+// Payment Gateway class
+class PaymentGateway {
+    Map<String, Wallet> wallets = new ConcurrentHashMap<>();
+    AtomicInteger processedCount = new AtomicInteger(0);
+    
+    public void registerUser(String userId, double initialBalance){
+        wallets.put(userId, new Wallet(userId, initialBalance));
+    }
+    
+    public Transaction processTransaction(String userId, double amount, PaymentType type){
+        Wallet w = wallets.get(userId);
+        Transaction tx = new Transaction(userId, amount, type);
+        if(type == PaymentType.WALLET){
+            boolean success = w.debit(amount);
+            tx.status = success ? Status.SUCCESS : Status.FAILED;
+        } else {
+            // Simulate card/UPI always success
+            tx.status = Status.SUCCESS;
+        }
+        processedCount.incrementAndGet();
+        return tx;
+    }
+    
+    public int getProcessedCount(){ return processedCount.get(); }
+}
+
+// Demo class
+public class PaymentGatewayDemo {
+    public static void main(String[] args) throws InterruptedException{
+        PaymentGateway gateway = new PaymentGateway();
+        int userCount = 10;
+        for(int i=0;i<userCount;i++) gateway.registerUser("user"+i, 1000);
+        
+        ExecutorService exec = Executors.newFixedThreadPool(5);
+        Random rand = new Random();
+        int txCount = 50;
+        
+        for(int i=0;i<txCount;i++){
+            exec.submit(() -> {
+                int uid = rand.nextInt(userCount);
+                double amt = rand.nextInt(200);
+                PaymentType type = (rand.nextInt(3)==0)? PaymentType.WALLET : (rand.nextInt(2)==0)? PaymentType.CARD : PaymentType.UPI;
+                Transaction tx = gateway.processTransaction("user"+uid, amt, type);
+                System.out.println("Processed tx for user"+uid+" type:"+type+" amount:"+amt+" status:"+tx.status);
+            });
+        }
+        
+        exec.shutdown();
+        exec.awaitTermination(1, TimeUnit.MINUTES);
+        System.out.println("Total transactions processed: "+gateway.getProcessedCount());
+    }
+}
