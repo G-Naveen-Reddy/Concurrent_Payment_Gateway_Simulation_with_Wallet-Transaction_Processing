@@ -1,13 +1,13 @@
 # Concurrent Payment Gateway Simulation with Wallet & Transaction Processing
 
-## Languages / Tech: 
+# Languages / Tech: 
 Java (OOP, concurrency), suggested infra: PostgreSQL/MySQL (wallet & transaction persistence), Optional: Redis (cache), Kafka/RabbitMQ (async notifications), Spring Boot (REST API)
 
-Project Summary : 
+# Project Summary : 
 
 A production-oriented payment gateway simulation that supports multiple payment methods (Wallet, Card, UPI), concurrent transaction processing, transaction status tracking, and wallet management. Integrates seamlessly with Notification System for OTPs, payment alerts, and confirmations. Designed for fintech/payment applications like Juspay.
 
-Key Impacts : 
+# Key Impacts : 
 
 1. Supports 1,000+ transactions per minute with concurrency-safe wallet operations.
 2. Tracks transaction status: PENDING, SUCCESS, FAILED for reliability and analytics.
@@ -15,7 +15,7 @@ Key Impacts :
 4. Easily extensible for multiple payment channels, retry mechanisms, and reporting.
 
 
-Architecture Diagram (Mermaid) :
+# Architecture Diagram (Mermaid) :
 
 flowchart LR
   User[Client / App] --> Gateway[Payment Gateway]
@@ -29,7 +29,7 @@ flowchart LR
 <img width="3840" height="1378" alt="Payment Gateway_System design" src="https://github.com/user-attachments/assets/f849f358-3c45-4114-b22a-0b48749f999b" />
 
 
-Design Highlights : 
+# Design Highlights : 
 
 1. Payment flow: User → Gateway → Auth → Wallet → Notification
 2. Multi-channel payments: Wallet, Card, UPI simulated via separate methods.
@@ -40,7 +40,7 @@ Design Highlights :
 7. Metrics & observability: Tracks transactions per minute, success rate, and failed transactions.
 
 
-How to Use / Run (Local Demo)
+# How to Use / Run (Local Demo)
 1. Clone the repo.
 2. Compile and run PaymentGatewayDemo.java in src.
 3. The demo simulates multiple users performing concurrent transactions with different payment methods.
@@ -51,7 +51,7 @@ How to Use / Run (Local Demo)
     -> Retry mechanism for failed transactions.
 
 
-Future Enhancements : 
+# Future Enhancements : 
 
 1. Persistent storage – save transactions and wallet balances in PostgreSQL/MySQL.
 2. Distributed transaction queue – integrate Kafka/RabbitMQ for high throughput.
