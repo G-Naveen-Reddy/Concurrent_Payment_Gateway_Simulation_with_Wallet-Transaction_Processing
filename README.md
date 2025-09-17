@@ -1,4 +1,4 @@
-Concurrent Payment Gateway Simulation with Wallet & Transaction Processing
+# Concurrent Payment Gateway Simulation with Wallet & Transaction Processing
 
 Languages / Tech: Java (OOP, concurrency), suggested infra: PostgreSQL/MySQL (wallet & transaction persistence), Optional: Redis (cache), Kafka/RabbitMQ (async notifications), Spring Boot (REST API)
 
